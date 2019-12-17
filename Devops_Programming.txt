@@ -1,0 +1,188 @@
+#!/bin/bash
+sudo su
+yum update -y
+echo "* * * * * root chef-client" >> /etc/crontab
+
+Chef:
+-----
+a) apache-recipe
+-----------------
+package "httpd" do
+  action :install
+end
+
+file "/var/www/html/index.html" do
+  content "This is Chef Workstation From Hyderabad Region"
+  action :create
+end
+
+
+service "httpd" do
+  action [ :enable, :start ]
+end
+
+b) sample-recipe
+----------------
+
+execute "run a script" do
+  command <<-EOH
+  mkdir /saidir
+  touch /saifile
+  EOH
+end
+
+user "raj" do
+  action :create
+end
+
+group "devops" do
+  action :create
+  members "raj"
+  append true
+end
+
+user "hari"
+file "/harifile"
+
+
+file "robofile" do
+  content "This is to get Attributes
+  HOSTNAME: #{node['hostname']}
+  IPADDRESS: #{node['ipaddress']}
+  CPU: #{node['cpu']['0']['mhz']}
+  MEMORY: #{node['memory']['total']}"
+  owner "root"
+  group "root"
+  action :create
+end
+
+
+c) test-recipe:
+---------------
+
+
+file "/myfile" do
+  content "Hello Everyone"
+  action :create
+end
+
+
+d) demo-recipe:
+---------------
+
+package "tree" do
+  action :install
+end
+
+file "/myfile2" do
+  content "This is my Second File"
+  action :create
+  owner "root"
+  group "root"
+end
+
+
+
+Dockerfile:
+-----------
+1) Dockerfile for executing apache2
+
+FROM ubuntu
+RUN apt-get update
+RUN apt-get -y install apache2
+ADD . /var/www/html
+ENTRYPOINT apachectl -D FOREGROUND
+ENV name Yogesh Chaudhary
+
+2) Dockerfile for sample testfile
+
+FROM ubuntu
+RUN echo "Hi Yogesh" > /tmp/testfile
+
+3) Dockerfile for sample testfile
+
+FROM ubuntu
+WORKDIR /tmp
+RUN echo "hi yogesh" > /tmp/testfile
+ENV myname Yogesh   		(echo $myname)
+COPY testfile1 /tmp  		(testfile1 must be available in current directory)
+ADD test.tar.gz /tmp		(test.tar.gz must be available in current directory)
+
+4) Dockerfile for creating Volumes
+
+FROM ubuntu
+VOLUME ["/data"]
+
+
+Ansible Playbook:
+
+a) --- # MY FIRST YAML PROGRAM
+- hosts: test
+  user: ansible
+  become: true
+  connection: ssh
+  tasks:
+          - name: Install HTTPD on CentOS
+            action: yum name=httpd state=installed
+          - name: Service HTTPD start on CentOS
+            action: service name=httpd state=started
+
+
+b) --- #My Second YAML Program
+- hosts: test
+  user: ansible
+  become: true
+  connection: ssh
+  vars:
+          pkgname: httpd
+  tasks:
+    - name: Install HTTPD on CentOS
+      action: yum name='{{pkgname}}' state=installed
+    - name: Start HTTPD Service
+      action: service name='{{pkgname}}' state=started
+
+c) --- # My Third YAML Program
+- hosts: test
+  user: ansible
+  become: true
+  connection: ssh
+  vars:
+       pkgname: httpd
+  tasks:
+    - name: Install HTTPD on CentOS
+      action: yum name='{{pkgname}}' state=installed
+      notify: restart HTTPD service
+
+  handlers:
+    - name: restart HTTPD service
+      action: service name='{{pkgname}}' state=started
+
+d) --- # My Fourth YAML Program
+
+- hosts: test
+  user: ansible
+  become: true
+  connection: ssh
+  tasks:
+    - name: ADD A LIST OF USERS
+      user: name='{{item}}' state=present
+      with_items:
+        - Kiran
+        - Gulab
+        - Shrikant
+
+e) --- # My Fifth YAML Program
+
+- hosts: test
+  user: ansible
+  become: true
+  connection: ssh
+  tasks:
+    - name: Install Apache for Debian
+      command: apt-get install apache2 -y
+      when: ansible_os_family=="Debian"
+
+    - name: Install apache for RedHat
+      command: yum install httpd -y
+      when: ansible_os_family=="RedHat"
+

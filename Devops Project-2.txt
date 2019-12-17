@@ -1,0 +1,79 @@
+   						Project - 2
+
+Pre-requisites:
+
+1) Jenkins Server
+2) Tomcat Server as Ansible-Host (Do Not Install Ansible) - Create User- ansible
+3) Ansible Server - Create User- ansible
+4) We are going to continue with Previous build job which was deployed on tomcat server
+
+Step 1 - Install "publish Over SSH"
+
+Manage Jenkins > Manage Plugins > Available > Publish over SSH
+Enable connection between Ansible Server and Jenkins
+
+Manage Jenkins > Configure System > Publish Over SSH > SSH Servers
+
+SSH Servers:
+Name: Ansible_Server
+Hostname:<PrivateIP_Ansible_Server>
+username: ansibleuser
+password: *******
+Test the connection "Test Connection"
+
+Step 2 - Execute job to connect
+create a copyfile.yml on Ansible_Server under /opt/playbooks
+
+# copyfile.yml
+---
+- hosts: demo 
+  become: true
+  tasks: 
+    - name: copy jar/war onto tomcat servers
+      copy:
+        src: /opt/playbooks/webapp/target/webapp.war
+        dest: /opt/tomcat/apache-tomcat-8.5.50/webapps
+
+Save the File and change the ownership
+
+***chown -R ansible:ansible /opt/playbooks/webapp/target
+
+Step 3 - Fill the following details:
+
+Create Jenkins job hello-world 
+
+Select Maven Project > ok
+
+Source Code Management:
+
+Repository: https://github.com/YogeshSanjayChaudhary/hello-world.git
+Branches to build : */master
+
+Build:
+
+Root POM:pom.xml
+Goals and options : clean install package
+
+Add post-build steps
+
+Choose Option Send files or execute commands over SSH
+SSH Server : ansible_server
+Source files: **/*.war
+Remove Prefix: 
+Remote directory: //opt//playbooks
+
+Add another post-build steps
+
+Choose option send files or execute commands over ssH
+SSH Server : ansible_server
+Exec command ansible-playbook /opt/playbooks/copyfile.yml
+Execute job and you should be able to seen build has been deployed on Tomcat server.
+
+Verify: http://<TOMCAT_SERVER_PUBLIC_IP>:<PORT_NO>/webapp
+
+Build Triggers
+Poll SCM
+schedule * * * * *
+Save the job and modify the code in GitHub. Then you could see your job get trigger a build without any manual intervention.
+
+Verify: http://<TOMCAT_SERVER_PUBLIC_IP>:<PORT_NO>/webapp 

@@ -1,0 +1,84 @@
+1.Initialise Docker Swarm on Manager Node
+
+docker swarm init --advertise-addr <private-ip-manager>
+
+2.Paste the Link after initialisation of Docker Manager on Worker Node
+
+3.docker node ls
+
+4.docker network ls
+
+5.docker network create -d overlay myoverlay --subnet 10.10.0.0/16
+
+6.docker network inspect myoverlay
+
+7.create service
+
+# docker service create --name web1 -p 80:80 --network myoverlay hshar/webapp
+
+# docker service ls
+
+# docker service create --name mysql -p 3306:3306 --network myoverlay hshar/mysql:5.5
+
+# docker service ls
+
+8.docker ps (On both nodes i.e.manager node as well as worker node)
+
+9.Goto container of service web1 by using following command
+
+docker exec -it <container-id> bash
+
+10.nano /var/www/html/index.php and changes appropriately
+
+$servername = "mysql";
+$username = "root";
+$password = "edureka";
+$dbname = "HandsOn";
+$name=$_POST["coursename"];
+$id=$_POST["courseid"];
+
+$sql = "INSERT INTO courses(coursename, courseid)
+VALUES ('".$name."', '".$id."')";
+
+11.Goto container of service mysql by using following command
+
+docker exec -it <container-id> bash
+
+12.create database using following commands:
+
+mysql -u root -pedureka
+CREATE DATABASE HandsOn;
+USE HandsOn;
+CREATE TABLE courses(coursename VARCHAR(15), courseid VARCHAR(12));
+
+13.Open the browser on web1 service host and enter the details and check the same details on the mysql database
+
+USE HandsOn;
+show tables;
+select * from courses;
+
+14.docker service scale web1=5
+
+15.docker service ps web1
+
+16.docker node inspect <nodename>
+
+17.update service
+
+# docker service update --image <imagename>:<service version name>
+
+18.Shutdown node
+
+# docker node update --availability drain <nodename>
+
+19.Remove Service
+
+# docker service rm web1
+
+20.Leave Swarm
+
+# docker swarm leave 
+
+21.Remove Node
+
+# docker node rm worker

@@ -1,0 +1,57 @@
+					        Simple Devops Project-1
+
+Prerequisites:
+
+1) EC2 instance with tomcat installation
+2) EC2 instance with Jenkins server
+
+
+Part-01 : Creating Job:
+
+1) Login to Jenkins console
+
+2) Create Jenkins job hello-world 
+
+3) Select Maven Project
+
+4) Fill the following details:
+
+Source Code Management:
+Repository: https://github.com/YogeshSanjayChaudhary/hello-world.git
+Branches to build : */master
+
+Build:
+Root POM:pom.xml
+Goals and options : clean install package
+
+Save it and Build Now...
+
+Install 'deploy to container' plugin. this is need to deploy on tomcat server which we are using.
+
+2) Setup credentials
+credentials > jenkins > Global credentials > add credentials
+Username : deployer
+Password : XXXXXXX
+id : Tomcat_user
+Description: Tomcat user to deploy on tomcat server
+Modify the same job which created in part-01 and add deployment steps.
+
+3) Post-Build Actions: 
+Deploy war/ear to container
+WAR/EAR files : **/*.war
+Containers : Tomcat 8.x
+Credentials: Tomcat_user (which created in above step)
+Tomcat URL : http://<PUBLIC_IP>:<PORT_NO>
+Save and build the job now.
+
+4) Continuous Integration & Continuous Deployment (CI/CD)
+Now job is running fine but to make this as Continuous Integration and Continuous Deployment Tool do that go back and modify job as below.
+
+Verify: http://<PUBLIC_IP>:<PORT_NO>/webapp
+
+5) Build Triggers
+Poll SCM
+schedule */2 * * * *
+Save the job and modify the code in GitHub. Then you could see your job get trigger a build without any manual intervention.
+
+Verify: http://<PUBLIC_IP>:<PORT_NO>/webapp 

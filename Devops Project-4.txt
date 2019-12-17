@@ -1,0 +1,103 @@
+						Project - 4
+
+Pre-Requisites :
+1) Jenkins Server
+2) Setup Ansible Server with ansible as user and install docker with dockeradmin as user
+3) Setup Ansible client with ansible as user and install docker with dockeradmin as user
+4) Docker Hub account
+5) ansible and dockeradmin users must be in same group docker for both Ansible & Dockerhost
+
+Run on both servers:
+gpasswd -a ansible docker
+gpasswd -a dockeradmin docker
+
+Part-01 : Create an docker image from Dockerfile which is placed on GitHub
+
+Login to Jenkins console
+
+Create Jenkins job as Project-4
+
+Fill the following details :
+
+Source Code Management:
+Repository : https://github.com/YogeshSanjayChaudhary/hello-world.git
+Branches to build : */master
+
+Build:
+Root POM:pom.xml
+Goals and options : clean install package
+
+Post Steps > Add post-build steps
+
+Send files or execute commands over SSH
+
+Name: ansible_server
+Source files : webapp/target/*.war
+Remove prefix : webapp/target
+Remote directory : //opt//docker
+
+Post Steps > Add post-build steps
+
+Send files or execute commands over SSH
+
+Name: ansible_server
+Source files : Dockerfile
+Remote directory : //opt//docker
+Exec Command:
+cd /opt/docker
+docker build -t myproject .
+docker tag myproject yogeshchaudhary/myproject
+docker push yogeshchaudhary/myproject
+docker rmi myproject yogeshchaudhary/myproject
+
+*** Login to docker hub from ansible user before build is executed.
+
+login to docker hub and check. shouldn't find images with for myproject
+
+Execute Jenkins job
+
+check images in Docker hub. Now you could able to see new images pushed to yogeshchaudhary Docker_Hub
+
+Troubleshooting:
+
+Docker should be installed on ansible server
+Should login to "docker hub" on ansible server
+ansadmin user should be part of docker group
+
+---------------------------
+
+Part-02 : Deploy Containers
+Write a yml file to create a container (file name : docker_container.yml)
+
+  ---
+  - hosts: demo
+    become: true
+    tasks:
+     - name: stop the container
+       shell: docker stop myproject
+
+     - name: remove stopped container
+       shell: docker rm -f myproject
+
+     - name: remove docker images
+       shell: docker image rm -f yogeshchaudhary/myproject
+  
+Use this script for 1-st     
+     - name: create docker image
+       shell: docker run -d --name myproject -p 8090:8080 yogeshchaudhary/myproject
+
+
+Add this script to Jenkins job.
+
+Choose "configure" to modify your jenkins job.
+Under post build actions
+Send files or execute commands over SSH
+Exec Command:
+
+   cd /opt/playbooks
+   ansible-playbook docker_container.yml
+Execute Jenkins job.
+
+You could see a new container on your docker host. can able access it from browser on port 8090
+
+Troubleshooting: Makesure you have opened required ports on AWS Security group for this server.

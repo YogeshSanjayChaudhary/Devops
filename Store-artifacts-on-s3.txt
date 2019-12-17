@@ -1,0 +1,39 @@
+Create a S3 bucket to store artifacts
+S3 --> Create bucket
+
+Bucket name: myproject
+Region: <any-region>
+Create new IAM role with "S3 full access" and assign it to jenkins server
+IAM --> Create role --> EC2
+
+Permission: AmazonS3FullAccess 
+Tags: key - Name, Value - S3FullAccess Role 
+name: S3_Full_Access
+Install "S3 Publisher" plugin on Jenkins
+Manage Jenkins --> Manage Plugins --> Availabe --> S3 publisher
+
+Configure S3 profile on Jenkins
+Manage Jenkins --> Configure Systems --> Amazon S3 profiles
+
+Profile name : myproject 
+Choose	     : Use IAM Role
+
+Create a job to store artifacts under S3.
+
+Goto Post-Build-actions
+
+Select-Publish artifacts to s3 Bucket
+
+source-**/webapp/target/*.war
+
+Exclude-webapp/target
+
+Destination bucket-myproject
+
+Storage class-STANDARD
+
+Bucket Region-<myproject-region>
+
+Save Job and Exit
+
+Build the Job and verify the artifacts on s3 buckets

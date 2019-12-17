@@ -1,0 +1,20 @@
+# yum install python3 -y
+# alternatives --set python /usr/bin/python3
+# python --version
+# yum -y install python3-pip
+# useradd ansadmin
+# passwd ansadmin
+# visudo 
+* ansadmin ALL=(ALL) NOPASSWD: ALL
+# vi /etc/ssh/sshd_config
+* Make Changes 
+# service sshd restart
+# su - ansadmin
+# pip3 install ansible --user
+# ansible --version
+# sudo mkdir /etc/ansible
+# cd /etc/ansible
+# sudo vi hosts
+# ssh-keygen
+# ssh-copy-id localhost
+# ansible all -m ping

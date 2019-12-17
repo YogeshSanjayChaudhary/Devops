@@ -1,0 +1,64 @@
+					Installation of Tomcat Server on Linux
+
+					Step-7: Launch Amazon Linux Instance on AWS
+
+# yum install java-1.8* -y
+# java -version
+# sudo su -
+# cd /opt
+# mkdir tomcat
+# cd tomcat
+# wget https://www-eu.apache.org/dist/tomcat/tomcat-8/v8.5.50/bin/apache-tomcat-8.5.50.tar.gz
+# tar -xvzf apache-tomcat-8.5.50.tar.gz
+# cd apache-tomcat-8.5.50/
+# cd bin
+# ps -ef | grep tomcat
+# ls -ltr
+# chmod +x startup.sh
+# chmod +x shutdown.sh
+# pwd
+# echo $PATH
+# ln -s /opt/tomcat/apache-tomcat-8.5.50/bin/startup.sh /usr/local/bin/tomcatup
+# ln -s /opt/tomcat/apache-tomcat-8.5.50/bin/shutdown.sh /usr/local/bin/tomcatdown 
+
+Change the port to 8090 and reflect same in security group and paste the IP in url
+
+# cd ..
+# cd conf
+# ls
+# vi server.xml
+# ps -ef | grep tomcat
+# tomcatup
+# ps -ef | grep tomcat
+
+Now we want to login to manager app
+
+# find / -name context.xml 
+vi /opt/tomcat/apache-tomcat-8.5.50/webapps/host-manager/META-INF/context.xml
+vi /opt/tomcat/apache-tomcat-8.5.50/webapps/manager/META-INF/context.xml
+
+Edit and Comment <!-- ...--> Value classname save it in both files
+ 
+# tomcatdown
+
+# tomcatup
+
+Now Manager App must ask for username and password
+
+# vi tomcat-users.xml
+
+In between tomcat users..copy users
+
+<role rolename="manager-gui"/>
+<role rolename="manager-script"/>
+<role rolename="manager-jmx"/>
+<role rolename="manager-status"/>
+<user username="admin" password="admin" roles="manager-gui, manager-script, manager-jmx, manager-status"/>
+<user username="deployer" password="deployer" roles="manager-script"/>
+<user username="tomcat" password="s3cret" roles="manager-gui"/>
+
+# tomcatdown
+
+# ps -ef | grep tomcat
+
+# tomcatup

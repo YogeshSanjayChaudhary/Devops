@@ -1,0 +1,86 @@
+						Performing CI-CD Pipeline on Linux
+
+						  Installation of Jenkins on Linux
+
+						Step-1: Launch Amazon Linux Instance on AWS
+
+
+# yum install java-1.8* -y
+
+# java -version
+
+# ls -la
+
+# find / -name javac (copy /usr/lib/jvm from listed path before /bin)
+
+# vi .bash_profile
+
+Set the path in file as 
+
+1) JAVA_HOME=Paste the Path Here
+
+2) PATH=$PATH:$JAVA_HOME/bin
+
+Then restart the session 
+
+#echo $PATH
+
+						Step 2: Install Jenkins
+
+
+Please Verify if wget is available or not...if not yum install wget -y
+
+# wget -O /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat-stable/jenkins.repo
+
+# rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io.key
+
+# yum install jenkins -y
+
+# service jenkins status
+
+# service jenkins start
+
+Open the port 8080 in Security group and paste the Public IP of Jenkins Server in URL and get the password from specified path and fill the necessary credentials and get started with Jenkins.
+
+# cat /var/lib/jenkins/secrets/initialAdminPassword
+
+							Step-3:
+ 
+Goto Manage Jenkins ---> Global Tool Configuration ---> Select JDK Installations ---> ADD JDK ---> Set the Name and Java Path
+
+# find / -name javac (Select /usr/lib/jvm from listed path and paste in jenkins)
+
+
+
+						Step-4: Install and Configure Maven
+
+
+
+Go To root user and switch to /opt directory. Create maven directory and inside it run the following commands
+
+# wget https://www-eu.apache.org/dist/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz
+
+# tar -xvzf apache-maven-3.6.3-bin.tar.gz
+
+# cd apache-maven-3.6.3 ---> 
+
+# pwd (copy the path ---> (/opt/maven/apache-maven-3.6.3)  goto /root and vi .bash_profile and set the following path for maven)
+
+
+M2_HOME=/opt/maven/apache-maven-3.6.3
+
+PATH=$PATH:$JAVA_HOME:$M2_HOME/bin
+
+Restart Session and Go to root user and echo $PATH and verify maven path is reflected.
+
+
+					Step-5: Installation of Plugins 
+
+Goto Jenkins and install plugins maven integration plugin.Set maven path under Global tool configuration as "/opt/maven/apache-maven-3.6.2"
+
+					Step-6: Installation of Git
+
+# yum install git -y
+
+Goto Jenkins and install plugins Github plugin.
+There is no need to set path for git in global tool configuration in jenkins.					  

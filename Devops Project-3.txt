@@ -1,0 +1,108 @@
+					Project 3
+
+Pre-requisites:
+
+1. Jenkins Server 
+
+Step 1 : 
+
+Launch an Amazon EC2 instance for Docker host
+
+Install docker on EC2 instance and start services
+
+# yum install docker -y
+# service docker status
+# service docker start
+# service docker status
+
+create a new user for Docker management and add him to Docker (default) group
+
+# useradd dockeradmin
+# passwd dockeradmin
+# gpasswd -a dockeradmin docker
+# Write a Docker file under /opt/docker
+# mkdir /opt/docker
+
+Step 2 : Write Dockerfile
+
+### vi Dockerfile
+
+# Pull base image 
+From tomcat:8-jre8
+
+# Maintainer
+MAINTAINER "YogeshChaudhary" 
+
+# copy war file on to container 
+COPY ./webapp.war /usr/local/tomcat/webapps
+
+Step 3 : SSH Connection
+
+# vi /etc/ssh/sshd_config
+# service sshd restart
+
+Manage Jenkins > Manage Plugins > Available > Publish over SSH
+Enable connection between Docker and Jenkins
+
+SSH Servers:
+Name: Docker_Host
+Hostname:<PrivateIP_Docker_Host>
+username: dockeradmin
+password: *******
+Test the connection "Test Connection"
+
+Step 4 : Create Jenkins job docker_project_3 
+
+A) Source Code Management
+Repository : https://github.com/YogeshSanjayChaudhary/hello-world.git
+Branches to build : */master
+
+B) Build Root POM: pom.xml
+Goals and options : clean install package
+
+C) Add Post-Build Step:
+ 
+Choose option send files or execute commands over SSH 
+
+Name: docker_host
+
+Source files : webapp/target/*.war 
+
+Remove prefix : webapp/target 
+
+Remote directory : //opt//docker
+
+Exec command[s] :
+docker stop myproject;
+docker rm -f myproject;
+docker image rm -f myproject;
+cd /opt/docker;
+docker build -t myproject .
+
+D) Add Post-Build Step
+
+Choose Option Send files or execute commands over SSH
+
+Name: docker_host
+
+Exec command : docker run -d --name myproject -p 8090:8080 myproject
+
+Login to Docker host and check images and containers. (no images and containers)
+
+***chown -R dockeradmin:dockeradmin /opt/docker
+
+Execute Jenkins job
+
+check images and containers again on Docker host. This time an image and container get creates through Jenkins job
+
+Access web application from browser which is running on container
+
+<docker_host_Public_IP>:8090/webapp
+
+Step 4 : Build Triggers
+
+Poll SCM
+schedule * * * * *
+Save the job and modify the code in GitHub. Then you could see your job get trigger a build without any manual intervention.
+
+<docker_host_Public_IP>:8090/webapp
