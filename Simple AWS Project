@@ -1,0 +1,52 @@
+1.yum update -y
+
+2.yum install httpd -y
+
+3.service httpd start
+
+4.Paste Public IP of EC2 in url and Test page for Apache is Available
+
+5.yum install php php-mysql mysql -y 
+
+6.amazon-linux-extras install -y php7.3
+
+7.Restart the Apache Web Server:
+  
+8.service httpd restart
+
+9.Create a page to test your PHP installation:
+  cd /var/www/html
+  vi test.php
+
+10.Paste in test.php
+ 
+  <?php phpinfo() ?>
+
+11.service httpd restart
+
+12.mysql -h [endpoint] -u [user] -p
+
+13.Enter Password for RDS and exit mysql
+
+14.Go To Root Account and enter /var/www/html
+
+15.wget https://wordpress.org/latest.tar.gz
+
+16.tar -xzvf latest.tar.gz 
+
+17.Now /var/www/html/ contains "wordpress"
+
+18.Go To wordpress and  Move all data from wordpress directory to html directory--> mv * ..
+
+19.check all data moved to /var/www/html then--> rm -rf wordpress and rm -rf latest.tar.gz
+
+20.Create Same Copy of wp-config-sample.php as wp-config.php and enter RDS details, save and exit the file 
+
+21.service httpd restart and Goto url and check wordpress configuration page is available
+
+
+
+C:\Windows\system32>ipconfig /flushdns
+
+
+
